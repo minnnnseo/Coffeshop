@@ -12,19 +12,37 @@ import com.shop.cafe.dto.Product;
 public class MemberDao {
 	
 	@Value("${spring.datasource.driver-class-name}")
-	String DB_DRIVER;
+	private String DB_DRIVER;
 	
 	@Value("${spring.datasource.url}")
-	String DB_URL;
+	private String DB_URL;
 	
 	@Value("${spring.datasource.username}")
-	String DB_USER;
+	private String DB_USER;
 	
 	@Value("${spring.datasource.password}")
-	String DB_PW;
+	private String DB_PW;
+	
+	public Member login(Member m) throws Exception{
+		System.out.println("MemberDao login() 호출됨");
+		Class.forName(DB_DRIVER);
+		Connection con=DriverManager.getConnection(DB_URL, DB_USER, DB_PW);
+		
+		PreparedStatement stmt=con.prepareStatement("select * from member where email=? and pwd=? ");
+		
+		stmt.setString(1, m.getEmail());
+		stmt.setString(2, m.getPwd());
+		
+		ResultSet rs = stmt.executeQuery();
+		if(rs.next()) {
+			String nickname = rs.getString("nickname");
+			m.setNickname(nickname);
+		}
+		return m;
+	}
 
-	public  void inserMember(Member m) throws Exception{
-		System.out.println("ProdutDao inserMember() 호출됨");
+	public  void insertMember(Member m) throws Exception{
+		System.out.println("ProdutDao insertMember() 호출됨");
 		Class.forName(DB_DRIVER);
 		Connection con=DriverManager.getConnection(DB_URL, DB_USER, DB_PW);
 		PreparedStatement stmt=con.prepareStatement("insert into member(email, pwd, nickname) values(?,?,?)");
